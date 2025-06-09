@@ -1,11 +1,17 @@
-# CI de Nível 01 - Disparo manual a partir de 1 clique
+# CI de Nível 02 - Disparo agendado
 
 # nome do nosso 'pipeline'
-name: 'Execução Manual'
+name: 'Execução Agendada'
 
-# regras de disparo (gatilhos/triggers) # gatilho de execução manual = worflow_dispatch
+# regras de disparo (gatilhos/triggers) # gatilho de execução agendada (cron a b c d e)
+# a minuto
+# b hora
+# c dia do mês
+# d mês
+# e dia da semana
 on:
-   workflow_dispatch:
+   schedule:
+    - cron: '0 6 * * 1'            # "cron": toda segunda feira as 6am
 
 # trabalhos/tarefas dentro do pipeline = jobs
 jobs:
@@ -16,10 +22,10 @@ jobs:
         #passos do script de build
         steps:
             # clone do projeto
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v4     # v4 - versão da action
 
             #instalações do node
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v4   # v4 - versão da action
               with:
                 node-version: latest
 
