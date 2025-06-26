@@ -1,0 +1,16 @@
+# bitbucket-pipelines.yml
+
+image: node:20
+
+pipelines:
+  custom:
+    manual-e2e:
+      - step:
+          name: Execução Manual E2E
+          caches:
+            - node
+          script:
+            - npm install -g yarn
+            - yarn
+            - yarn playwright install
+            - yarn run e2e

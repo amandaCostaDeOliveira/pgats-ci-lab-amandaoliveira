@@ -1,0 +1,45 @@
+# CI de Nível 03 - Disparo após a conclusão de um pipeline de deploy
+
+# nome do nosso 'pipeline'
+name: 'Execução Pós Deploy'
+
+# regras de disparo (gatilhos/triggers) # gatilho de execução a partir de outro pipe = worflow_run
+on:
+   workflow_run:
+    workflows: ['Execução Manual']         #nome do pipeline usado como gatilho
+    types:
+        - completed                        #o que deve acontecer com o pipeline para ocorrer o disparo
+
+# trabalhos/tarefas dentro do pipeline = jobs
+jobs:
+    e2e-tests:
+        # maquina que o job vai executar
+        runs-on: ubuntu-latest
+
+        #passos do script de build
+        steps:
+            # clone do projeto
+            - uses: actions/checkout@v4
+
+            #instalações do node
+            - uses: actions/setup-node@v4
+              with:
+                node-version: latest
+
+            #instalações do Yarn
+            - name: Instalando Yarn
+              run: npm install -g yarn
+
+            #instalação das dependências
+            - name: Instalando dependências
+              run: yarn
+
+            #instalação do Playwright
+            - name: Instalando Playwright
+              run: yarn playwright install
+
+            #executar os testes E2E
+            - name: Executando testes E2E
+              run: yarn run e2e
+
+            
