@@ -48,4 +48,13 @@ jobs:
             - name: Executando testes E2E
               run: yarn run e2e
 
+            - uses: actions/upload-artifact@v4          #sobe arquivos da execução para permitir o posterior download
+              #eu quero ter as evidências independente se os testes passarem ou falharem. Se algo falhar, os steps não chegariam nesse das evidências.
+              #esse if vai "contornar" isso dizendo que é para executar esse step sempre, a não ser que seja cancelado. 
+              if: ${{!cancelled()}}                         
+              with:
+                name: relatorio
+                path: ./playwright-report
+            
+
             
