@@ -5,56 +5,53 @@ name: 'Execução Pós Deploy'
 
 # regras de disparo (gatilhos/triggers) # gatilho de execução a partir de outro pipe = worflow_run
 on:
-   workflow_run:
-    workflows: ['Execução Manual']         #nome do pipeline usado como gatilho
+  workflow_run:
+    workflows: ['Execução Manual'] #nome do pipeline usado como gatilho
     types:
-        - completed                        #o que deve acontecer com o pipeline para ocorrer o disparo
+      - completed #o que deve acontecer com o pipeline para ocorrer o disparo
 
 # trabalhos/tarefas dentro do pipeline = jobs
 jobs:
-    e2e-tests:
-        # maquina que o job vai executar
-        runs-on: ubuntu-latest
+  e2e-tests:
+    # maquina que o job vai executar
+    runs-on: ubuntu-latest
 
-        #condicional - if
-        # `${ expressao }`
-        # == comparação
+    #condicional - if
+    # `${ expressao }`
+    # == comparação
 
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        
-        #passos do script de build
-        steps:
-            # clone do projeto
-            - uses: actions/checkout@v4
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
-            #instalações do node
-            - uses: actions/setup-node@v4
-              with:
-                node-version: latest
+    #passos do script de build
+    steps:
+      # clone do projeto
+      - uses: actions/checkout@v4
 
-            #instalações do Yarn
-            - name: Instalando Yarn
-              run: npm install -g yarn
+      #instalações do node
+      - uses: actions/setup-node@v4
+        with:
+          node-version: latest
 
-            #instalação das dependências
-            - name: Instalando dependências
-              run: yarn
+      #instalações do Yarn
+      - name: Instalando Yarn
+        run: npm install -g yarn
 
-            #instalação do Playwright
-            - name: Instalando Playwright
-              run: yarn playwright install
+      #instalação das dependências
+      - name: Instalando dependências
+        run: yarn
 
-            #executar os testes E2E
-            - name: Executando testes E2E
-              run: yarn run e2e
+      #instalação do Playwright
+      - name: Instalando Playwright
+        run: yarn playwright install
 
-            - uses: actions/upload-artifact@v4          #sobe arquivos da execução para permitir o posterior download
-              #eu quero ter as evidências independente se os testes passarem ou falharem. Se algo falhar, os steps não chegariam nesse das evidências.
-              #esse if vai "contornar" isso dizendo que é para executar esse step sempre, a não ser que seja cancelado. 
-              if: ${{!cancelled()}}                         
-              with:
-                name: relatorio
-                path: ./playwright-report
-            
+      #executar os testes E2E
+      - name: Executando testes E2E
+        run: yarn run e2e
 
-            
+      - uses: actions/upload-artifact@v4 #sobe arquivos da execução para permitir o posterior download
+        #eu quero ter as evidências independente se os testes passarem ou falharem. Se algo falhar, os steps não chegariam nesse das evidências.
+        #esse if vai "contornar" isso dizendo que é para executar esse step sempre, a não ser que seja cancelado.
+        if: ${{!cancelled()}}
+        with:
+          name: relatorio
+          path: ./playwright-report
