@@ -1,0 +1,84 @@
+# CI de Nível 04 - Disparo dos testes dentro do pipe de DEV
+
+name: 'Execução Integrada'
+
+on:
+    workflow_dispatch:
+
+jobs:
+    inspecao:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Instalando Yarn
+              run: npm install -g yarn
+
+            - name: Instalando dependências
+              run: yarn
+
+            - name: Checando padronização do código
+              run: yarn lint
+
+    unidade:
+        runs-on: ubuntu-latest
+    
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Instalando Yarn
+              run: npm install -g yarn
+
+            - name: Instalando dependências
+              run: yarn
+
+            - name: Executando testes de unidade
+              run: yarn test
+
+    e2e-tests:
+        # maquina que o job vai executar
+        runs-on: ubuntu-latest
+
+        #passos do script de build
+        steps:
+            # clone do projeto
+            - uses: actions/checkout@v4
+
+            #instalações do node
+            - uses: actions/setup-node@v4
+              with:
+                node-version: latest
+
+            #instalações do Yarn
+            - name: Instalando Yarn
+              run: npm install -g yarn
+
+            #instalação das dependências
+            - name: Instalando dependências
+              run: yarn
+
+            #instalação do Playwright
+            - name: Instalando Playwright
+              run: yarn playwright install
+
+            #executar os testes E2E
+            - name: Executando testes E2E
+              run: yarn run e2e
+
+
+            - uses: actions/upload-artifact@v4          #sobe arquivos da execução para permitir o posterior download
+              #eu quero ter as evidências independente se os testes passarem ou falharem. Se algo falhar, os steps não chegariam nesse das evidências.
+              #esse if vai "contornar" isso dizendo que é para executar esse step sempre, a não ser que seja cancelado. 
+              if: ${{!cancelled()}}                         
+              with:
+                name: relatorio
+                path: ./playwright-report
+    
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Simulação do Deploy
+              run: echo "Simulando o deploy com sucesso"
+    
